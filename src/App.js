@@ -35,34 +35,34 @@ function App() {
   // ✅ Get Feedback (GET) - Fixed API Call
   const getFeedback = async () => {
     try {
-      const { name, number } = search;
-      if (!name || !number) {
-        setMessage("Both Name and Number are required!");
-        return;
-      }
+        const { name, number } = search;
+        
+        if (!name || !number) {
+            setMessage("Both Name and Number are required!");
+            return;
+        }
 
-      console.log(`🔍 Fetching feedback for: ${JSON.stringify(search)}`);
+        console.log(`🔍 Fetching feedback for: Name=${name}, Number=${number}`);
 
-      const response = await axios.get(`${API_BASE_URL}/get-feedback`, {
-        params: { name, number }
-      });
+        const response = await axios.get(`${API_BASE_URL}/get-feedback?name=${encodeURIComponent(name)}&number=${encodeURIComponent(number)}`);
 
-      console.log("✅ API Response:", response.data);
+        console.log("✅ API Raw Response:", response);
+        console.log("✅ API Response Data:", response.data);
 
-      // ✅ Fix: Ensure feedbacks exist before accessing `.length`
-      if (response.data.success && Array.isArray(response.data.feedbacks) && response.data.feedbacks.length > 0) {
-        setFeedbacks(response.data.feedbacks);
-        setMessage('');
-      } else {
-        setFeedbacks([]);
-        setMessage('No feedback found');
-      }
+        if (response.data.success && response.data.feedbacks.length > 0) {
+            setFeedbacks(response.data.feedbacks);
+            setMessage('');
+        } else {
+            setFeedbacks([]);
+            setMessage('No feedback found');
+        }
     } catch (error) {
-      console.error("❌ API Error:", error);
-      setMessage('Error fetching feedback');
-      setFeedbacks([]);
+        console.error("❌ API Error:", error);
+        setMessage('Error fetching feedback');
+        setFeedbacks([]);
     }
-  };
+};
+
 
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
