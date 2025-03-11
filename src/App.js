@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = "https://aaef-106-216-173-143.ngrok-free.app"; // Replace with your backend URL
+const API_BASE_URL = "https://aaef-106-216-173-143.ngrok-free.app"; // ✅ Update to match your backend
 
 function App() {
   const [form, setForm] = useState({ name: '', number: '', message: '' });
   const [search, setSearch] = useState({ name: '', number: '' });
-  const [feedback, setFeedback] = useState(null);
+  const [feedbacks, setFeedbacks] = useState([]);
   const [message, setMessage] = useState('');
 
   // Handle input change
@@ -18,44 +18,40 @@ function App() {
     setSearch({ ...search, [e.target.name]: e.target.value });
   };
 
-  // Send Feedback
+  // ✅ Send Feedback (POST)
   const sendFeedback = async () => {
-    if (!form.name || !form.number || !form.message) {
-      setMessage("All fields are required");
-      return;
-    }
-
     try {
       const response = await axios.post(`${API_BASE_URL}/send-feedback`, form);
       setMessage(response.data.message);
-      setForm({ name: '', number: '', message: '' }); // Reset form
+      setForm({ name: '', number: '', message: '' });
     } catch (error) {
       setMessage('Error submitting feedback');
     }
   };
 
-  // Get Feedback by BOTH Name & Number
+  // ✅ Get Feedback (GET) - Now Uses Query Parameters
   const getFeedback = async () => {
-    if (!search.name || !search.number) {
-      setMessage("Both name and number are required");
-      return;
-    }
-
     try {
+      const { name, number } = search;
+      if (!name || !number) {
+        setMessage("Both Name and Number are required!");
+        return;
+      }
+
       const response = await axios.get(`${API_BASE_URL}/get-feedback`, {
-        params: { name: search.name, number: search.number } // ✅ Corrected to use GET params
+        params: { name, number } // ✅ Correct way to pass query parameters
       });
 
-      if (response.data.success && response.data.feedbacks.length > 0) {
-        setFeedback(response.data.feedbacks);
+      if (response.data.success) {
+        setFeedbacks(response.data.feedbacks);
         setMessage('');
       } else {
-        setFeedback(null);
+        setFeedbacks([]);
         setMessage('No feedback found');
       }
     } catch (error) {
       setMessage('Error fetching feedback');
-      setFeedback(null);
+      setFeedbacks([]);
     }
   };
 
@@ -83,11 +79,11 @@ function App() {
 
       {/* Display Feedback */}
       <div>
-        {feedback ? (
+        {feedbacks.length > 0 ? (
           <div style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
             <h2>Feedback Details</h2>
-            {feedback.map((item, index) => (
-              <p key={index}><strong>Message:</strong> {item.message}</p>
+            {feedbacks.map((fb, index) => (
+              <p key={index}><strong>Message:</strong> {fb.message}</p>
             ))}
           </div>
         ) : (
