@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = "https://aaef-106-216-173-143.ngrok-free.app";
+const API_BASE_URL = "https://d617-106-216-173-143.ngrok-free.app";
 
 function App() {
   const [form, setForm] = useState({ name: '', number: '', message: '' });
