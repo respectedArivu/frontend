@@ -31,20 +31,35 @@ function App() {
   // ✅ Get Feedback (GET)
   const getFeedback = async () => {
     try {
-      const { name, number } = search;
-      if (!name || !number) {
-        setMessage("Both Name and Number are required!");
-        return;
-      }
+        const { name, number } = search;
 
-      const response = await axios.get(`${API_BASE_URL}/get-feedback`, { params: { name, number } });
-      setFeedbacks(response.data.feedbacks || []);
-      setMessage(response.data.message);
+        if (!name || !number) {
+            setMessage("Both Name and Number are required!");
+            return;
+        }
+
+        console.log(`🔍 Fetching feedback for: Name=${name}, Number=${number}`);
+
+        const response = await axios.get(`${API_BASE_URL}/get-feedback`, {
+            params: { name, number }
+        });
+
+        console.log("✅ API Response:", response.data);
+
+        if (response.data.success && response.data.feedbacks.length > 0) {
+            setFeedbacks(response.data.feedbacks);
+            setMessage("");  // Clear any previous error messages
+        } else {
+            setFeedbacks([]);
+            setMessage(response.data.message || "No feedback found");
+        }
     } catch (error) {
-      setMessage(error.response?.data?.message || 'Error fetching feedback');
-      setFeedbacks([]);
+        console.error("❌ API Error:", error);
+        setMessage("Error fetching feedback");
+        setFeedbacks([]);
     }
-  };
+};
+
 
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
