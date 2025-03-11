@@ -32,7 +32,7 @@ function App() {
     }
   };
 
-  // ✅ Get Feedback (GET) with correct query parameters
+  // ✅ Get Feedback (GET) - Fixed API Call
   const getFeedback = async () => {
     try {
       const { name, number } = search;
@@ -47,10 +47,10 @@ function App() {
         params: { name, number }
       });
 
-      console.log("✅ API Raw Response:", response);
-      console.log("✅ API Response Data:", response.data);
+      console.log("✅ API Response:", response.data);
 
-      if (response.data.success && response.data.feedbacks && response.data.feedbacks.length > 0) {
+      // ✅ Fix: Ensure feedbacks exist before accessing `.length`
+      if (response.data.success && Array.isArray(response.data.feedbacks) && response.data.feedbacks.length > 0) {
         setFeedbacks(response.data.feedbacks);
         setMessage('');
       } else {
@@ -96,7 +96,7 @@ function App() {
             ))}
           </div>
         ) : (
-          <p>No feedback available</p>
+          <p>{message || "No feedback available"}</p> // ✅ Fix: Show the correct message
         )}
       </div>
     </div>
