@@ -20,10 +20,15 @@ function App() {
 
   // Send Feedback
   const sendFeedback = async () => {
+    if (!form.name || !form.number || !form.message) {
+      setMessage("All fields are required");
+      return;
+    }
+
     try {
       const response = await axios.post(`${API_BASE_URL}/send-feedback`, form);
       setMessage(response.data.message);
-      setForm({ name: '', number: '', message: '' });
+      setForm({ name: '', number: '', message: '' }); // Reset form
     } catch (error) {
       setMessage('Error submitting feedback');
     }
@@ -31,11 +36,18 @@ function App() {
 
   // Get Feedback by BOTH Name & Number
   const getFeedback = async () => {
+    if (!search.name || !search.number) {
+      setMessage("Both name and number are required");
+      return;
+    }
+
     try {
-      const response = await axios.post(`${API_BASE_URL}/get-feedback`, search);
-      
-      if (response.data.success) {
-        setFeedback(response.data.message);
+      const response = await axios.get(`${API_BASE_URL}/get-feedback`, {
+        params: { name: search.name, number: search.number } // ✅ Corrected to use GET params
+      });
+
+      if (response.data.success && response.data.feedbacks.length > 0) {
+        setFeedback(response.data.feedbacks);
         setMessage('');
       } else {
         setFeedback(null);
@@ -74,7 +86,9 @@ function App() {
         {feedback ? (
           <div style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
             <h2>Feedback Details</h2>
-            <p><strong>Message:</strong> {feedback}</p>
+            {feedback.map((item, index) => (
+              <p key={index}><strong>Message:</strong> {item.message}</p>
+            ))}
           </div>
         ) : (
           <p>No feedback available</p>
