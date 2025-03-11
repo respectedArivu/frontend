@@ -49,13 +49,7 @@ function App() {
         console.log("✅ API Raw Response:", response);
         console.log("✅ API Response Data:", response.data);
 
-        if (response.data.success && response.data.feedbacks.length > 0) {
-            setFeedbacks(response.data.feedbacks);
-            setMessage('');
-        } else {
-            setFeedbacks([]);
-            setMessage('No feedback found');
-        }
+       
     } catch (error) {
         console.error("❌ API Error:", error);
         setMessage('Error fetching feedback');
