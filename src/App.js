@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = "https://7fe8-106-216-173-143.ngrok-free.app"; // Replace with your backend URL
+const API_BASE_URL = "https://b881-106-216-173-143.ngrok-free.app"; // Replace with your backend URL
 
 function App() {
   const [form, setForm] = useState({ name: '', number: '', message: '' });
