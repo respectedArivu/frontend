@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = "https://6465-106-216-173-109.ngrok-free.app"; // Backend URL
+const API_BASE_URL = "https://6465-106-216-173-109.ngrok-free.app"; // Replace with your backend URL
 
 function App() {
   const [form, setForm] = useState({ name: '', number: '', message: '' });
   const [searchNumber, setSearchNumber] = useState('');
-  const [feedbacks, setFeedbacks] = useState([]);
+  const [feedback, setFeedback] = useState(null);
   const [message, setMessage] = useState('');
 
-  // Handle input changes
+  // Handle input change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
-  // Function to sanitize phone numbers (removes spaces & special characters)
-  const sanitizeNumber = (number) => number.replace(/\D/g, '');
 
   // Send Feedback
   const sendFeedback = async () => {
@@ -25,30 +22,24 @@ function App() {
       setForm({ name: '', number: '', message: '' });
     } catch (error) {
       setMessage('Error submitting feedback');
-      console.error("❌ Error submitting feedback:", error);
     }
   };
 
-  // Get Feedback
+  // Get Feedback by Number (B)
   const getFeedback = async () => {
     try {
-      const sanitizedNumber = sanitizeNumber(searchNumber);
-      console.log("🔍 Fetching feedback for:", sanitizedNumber);
-
-      const response = await axios.get(`${API_BASE_URL}/get-feedback/${sanitizedNumber}`);
-      console.log("✅ API Response:", response.data);
-
-      if (response.data.success && Array.isArray(response.data.feedbacks)) {
-        setFeedbacks(response.data.feedbacks);
-        setMessage(response.data.feedbacks.length ? '' : 'No feedback found');
+      const response = await axios.get(`${API_BASE_URL}/get-feedback/${searchNumber}`);
+      
+      if (response.data.success) {
+        setFeedback(response.data.feedback); 
+        setMessage('');
       } else {
-        setFeedbacks([]);
+        setFeedback(null);
         setMessage('No feedback found');
       }
     } catch (error) {
       setMessage('Error fetching feedback');
-      console.error("❌ Error fetching feedback:", error.response?.data || error.message);
-      setFeedbacks([]);
+      setFeedback(null);
     }
   };
 
@@ -73,18 +64,13 @@ function App() {
         <button onClick={getFeedback}>Get Feedback</button>
       </div>
 
-      {/* Display Feedbacks */}
+      {/* Display Feedback */}
       <div>
-        {feedbacks.length > 0 ? (
-          <div>
-            <h2>Feedbacks</h2>
-            {feedbacks.map((fb, index) => (
-              <div key={index} style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
-                <p><strong>Name:</strong> {fb.name}</p>
-                <p><strong>Number:</strong> {fb.number}</p>
-                <p><strong>Message:</strong> {fb.message}</p>
-              </div>
-            ))}
+        {feedback ? (
+          <div style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
+            <h2>Feedback Details</h2>
+            <p><strong>Name:</strong> {feedback.name}</p>
+            <p><strong>Message:</strong> {feedback.message}</p>
           </div>
         ) : (
           <p>No feedback available</p>
