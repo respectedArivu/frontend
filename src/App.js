@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = "https://8a52-106-216-173-143.ngrok-free.app"; // Replace with your backend URL
+const API_BASE_URL = "https://9035-106-216-173-143.ngrok-free.app"; // Replace with your backend URL
 
 function App() {
   const [form, setForm] = useState({ name: '', number: '', message: '' });
-  const [searchNumber, setSearchNumber] = useState('');
+  const [search, setSearch] = useState({ name: '', number: '' });
   const [feedback, setFeedback] = useState(null);
   const [message, setMessage] = useState('');
 
   // Handle input change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch({ ...search, [e.target.name]: e.target.value });
   };
 
   // Send Feedback
@@ -25,13 +29,13 @@ function App() {
     }
   };
 
-  // Get Feedback by Number (B)
+  // Get Feedback by BOTH Name & Number
   const getFeedback = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/get-feedback/${searchNumber}`);
+      const response = await axios.post(`${API_BASE_URL}/get-feedback`, search);
       
       if (response.data.success) {
-        setFeedback(response.data.feedback); 
+        setFeedback(response.data.message);
         setMessage('');
       } else {
         setFeedback(null);
@@ -59,8 +63,9 @@ function App() {
 
       {/* Get Feedback */}
       <div>
-        <h2>Search Feedback by Number</h2>
-        <input type="text" placeholder="Enter Number" value={searchNumber} onChange={(e) => setSearchNumber(e.target.value)} />
+        <h2>Search Feedback</h2>
+        <input type="text" name="name" placeholder="Enter Name" value={search.name} onChange={handleSearchChange} /><br />
+        <input type="text" name="number" placeholder="Enter Number" value={search.number} onChange={handleSearchChange} /><br />
         <button onClick={getFeedback}>Get Feedback</button>
       </div>
 
@@ -69,8 +74,7 @@ function App() {
         {feedback ? (
           <div style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
             <h2>Feedback Details</h2>
-            <p><strong>Name:</strong> {feedback.name}</p>
-            <p><strong>Message:</strong> {feedback.message}</p>
+            <p><strong>Message:</strong> {feedback}</p>
           </div>
         ) : (
           <p>No feedback available</p>
