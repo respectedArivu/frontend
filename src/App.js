@@ -20,7 +20,12 @@ function App() {
   // ✅ Send Feedback (POST)
   const sendFeedback = async () => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/send-feedback`, form);
+      const response = await axios.post(`${API_BASE_URL}/send-feedback`, form, {
+        headers: { 
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true' // ✅ Bypass ngrok warning
+        }
+      });
       setMessage(response.data.message);
       setForm({ name: '', number: '', message: '' });
     } catch (error) {
@@ -31,35 +36,37 @@ function App() {
   // ✅ Get Feedback (GET)
   const getFeedback = async () => {
     try {
-        const { name, number } = search;
+      const { name, number } = search;
 
-        if (!name || !number) {
-            setMessage("Both Name and Number are required!");
-            return;
+      if (!name || !number) {
+        setMessage("Both Name and Number are required!");
+        return;
+      }
+
+      console.log(`🔍 Fetching feedback for: Name=${name}, Number=${number}`);
+
+      const response = await axios.get(`${API_BASE_URL}/get-feedback`, {
+        params: { name, number },
+        headers: {
+          'ngrok-skip-browser-warning': 'true' // ✅ Bypass ngrok warning
         }
+      });
 
-        console.log(`🔍 Fetching feedback for: Name=${name}, Number=${number}`);
+      console.log("✅ API Response:", response.data);
 
-        const response = await axios.get(`${API_BASE_URL}/get-feedback`, {
-            params: { name, number }
-        });
-
-        console.log("✅ API Response:", response.data);
-
-        if (response.data.success && response.data.feedbacks.length > 0) {
-            setFeedbacks(response.data.feedbacks);
-            setMessage("");  // Clear any previous error messages
-        } else {
-            setFeedbacks([]);
-            setMessage(response.data.message || "No feedback found");
-        }
-    } catch (error) {
-        console.error("❌ API Error:", error);
-        setMessage("Error fetching feedback");
+      if (response.data.success && response.data.feedbacks.length > 0) {
+        setFeedbacks(response.data.feedbacks);
+        setMessage("");  // Clear any previous error messages
+      } else {
         setFeedbacks([]);
+        setMessage(response.data.message || "No feedback found");
+      }
+    } catch (error) {
+      console.error("❌ API Error:", error);
+      setMessage("Error fetching feedback");
+      setFeedbacks([]);
     }
-};
-
+  };
 
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
