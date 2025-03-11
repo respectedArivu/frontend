@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = "https://your-render-backend.onrender.com"; // Replace with your backend URL
+const API_BASE_URL = "https://frontend-2t7p.onrender.com"; // Replace with your backend URL
 
 function App() {
   const [form, setForm] = useState({ name: '', number: '', message: '' });
