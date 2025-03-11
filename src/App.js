@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = "https://6465-106-216-173-109.ngrok-free.app"; // Replace with your backend URL
+const API_BASE_URL = "https://6465-106-216-173-109.ngrok-free.app"; // Backend URL
 
 function App() {
   const [form, setForm] = useState({ name: '', number: '', message: '' });
@@ -9,10 +9,13 @@ function App() {
   const [feedbacks, setFeedbacks] = useState([]);
   const [message, setMessage] = useState('');
 
-  // Handle input change
+  // Handle input changes
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  // Function to sanitize phone numbers (removes spaces & special characters)
+  const sanitizeNumber = (number) => number.replace(/\D/g, '');
 
   // Send Feedback
   const sendFeedback = async () => {
@@ -22,14 +25,19 @@ function App() {
       setForm({ name: '', number: '', message: '' });
     } catch (error) {
       setMessage('Error submitting feedback');
+      console.error("❌ Error submitting feedback:", error);
     }
   };
 
   // Get Feedback
   const getFeedback = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/get-feedback/${searchNumber}`);
-      
+      const sanitizedNumber = sanitizeNumber(searchNumber);
+      console.log("🔍 Fetching feedback for:", sanitizedNumber);
+
+      const response = await axios.get(`${API_BASE_URL}/get-feedback/${sanitizedNumber}`);
+      console.log("✅ API Response:", response.data);
+
       if (response.data.success && Array.isArray(response.data.feedbacks)) {
         setFeedbacks(response.data.feedbacks);
         setMessage(response.data.feedbacks.length ? '' : 'No feedback found');
@@ -39,6 +47,7 @@ function App() {
       }
     } catch (error) {
       setMessage('Error fetching feedback');
+      console.error("❌ Error fetching feedback:", error.response?.data || error.message);
       setFeedbacks([]);
     }
   };
