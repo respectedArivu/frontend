@@ -29,7 +29,14 @@ function App() {
   const getFeedback = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/get-feedback/${searchNumber}`);
-      setFeedbacks(response.data.feedbacks);
+      
+      if (response.data.success && Array.isArray(response.data.feedbacks)) {
+        setFeedbacks(response.data.feedbacks);
+        setMessage(response.data.feedbacks.length ? '' : 'No feedback found');
+      } else {
+        setFeedbacks([]);
+        setMessage('No feedback found');
+      }
     } catch (error) {
       setMessage('Error fetching feedback');
       setFeedbacks([]);
@@ -59,7 +66,7 @@ function App() {
 
       {/* Display Feedbacks */}
       <div>
-        {feedbacks.length > 0 && (
+        {feedbacks.length > 0 ? (
           <div>
             <h2>Feedbacks</h2>
             {feedbacks.map((fb, index) => (
@@ -70,6 +77,8 @@ function App() {
               </div>
             ))}
           </div>
+        ) : (
+          <p>No feedback available</p>
         )}
       </div>
     </div>
